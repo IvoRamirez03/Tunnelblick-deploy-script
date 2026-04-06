@@ -48,6 +48,27 @@ Tunnelblick enforces strict permission checks via `openvpnstart`. The required l
 | Any other file in `Resources/` | **`700`** root:wheel |
 
 > **Important:** `config.ovpn` and all other files in `Resources/` (keys, certs, etc.) must be `0700`, not `0644`. Tunnelblick considers any config file readable by non-root users as insecure and will refuse to connect with the message *"The configuration is not secure. It must be reinstalled."*
+>
+> ---
+
+## Applivery Config (PPPC / FDA)
+
+In order for the script to move configuration files to `/Library/Application Support/Tunnelblick` and manage network permissions without user intervention, it is necessary to configure a **Privacy Preferences Policy Control (PPPC)** profile in Applivery.
+
+Without this, macOS will block the agent's actions and the script will fail when attempting to write to protected directories.
+
+### Payload config:
+
+| Campo | Valor |
+| :--- | :--- |
+| **Service** | System Policy All Files |
+| **Identifier** | `com.applivery.mdm-agent-macos` |
+| **Identifier Type** | Bundle ID |
+| **Code Requirement** | `anchor apple generic and identifier "com.applivery.mdm-agent-macos" and (certificate leaf[field.1.2.840.113635.100.6.1.9] /* exists */ or certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = BJ55G8KDLB)` |
+| **Comment** | FDA script for Tunnelblick |
+
+> [!IMPORTANT]
+> Make sure to assign this profile to the same devices or groups where you will deploy the Tunnelblick script. This grants the Applivery agent full disk access so it can perform the installation correctly.
 
 ## Known issues
 
